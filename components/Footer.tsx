@@ -1,11 +1,4 @@
 import { Container, Typography, Box } from '@mui/material';
-import styled from 'styled-components';
-
-const StyledFooter = styled.footer`
-  background: white;
-  padding: 9rem 0;
-  border-top: 1px solid #E2E8F0;
-`;
 
 const Footer = () => (
   <Box 
