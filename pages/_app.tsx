@@ -2,7 +2,11 @@ import { AppProps } from 'next/app';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { StyleSheetManager, createGlobalStyle } from 'styled-components';
 import Head from 'next/head';
+import { CacheProvider } from '@emotion/react';
+import createEmotionCache from '../utils/createEmotionCache';
 import theme from '../styles/theme';
+
+const clientSideEmotionCache = createEmotionCache();
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -13,20 +17,17 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps, emotionCache = clientSideEmotionCache }: AppProps & { emotionCache?: ReturnType<typeof createEmotionCache> }) {
   return (
-    <StyleSheetManager shouldForwardProp={(prop) => prop !== 'as'}>
-      <ThemeProvider theme={theme}>
-        <Head>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        </Head>
-        <CssBaseline />
-        <GlobalStyle />
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </StyleSheetManager>
+    <CacheProvider value={emotionCache}>
+      <StyleSheetManager shouldForwardProp={(prop) => prop !== 'as'}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <GlobalStyle />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </StyleSheetManager>
+    </CacheProvider>
   );
 }
 

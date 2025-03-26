@@ -7,7 +7,9 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com'],
   },
-  devIndicators: false,
+  devIndicators: {
+    buildActivity: false
+  },
   poweredByHeader: false,
 };
 
