@@ -4,6 +4,11 @@ const nextConfig = {
     styledComponents: true,
   },
   reactStrictMode: true,
+  images: {
+    domains: ['images.unsplash.com'],
+  },
+  devIndicators: false,
+  poweredByHeader: false,
 };
 
 module.exports = nextConfig; 
