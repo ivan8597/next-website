@@ -1,90 +1,132 @@
-import Image, { ImageProps } from 'next/image';
-import { useState, useEffect } from 'react';
+import React from 'react';
+import Image from 'next/image';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
-interface OptimizedImageProps extends Omit<ImageProps, 'onLoadingComplete'> {
-  aspectRatio?: number;
+interface ImageWrapperProps {
+  $rounded?: boolean;
+  $shadow?: boolean;
+}
+
+const ImageWrapper = styled(motion.div)<ImageWrapperProps>`
+  position: relative;
+  overflow: hidden;
+  border-radius: ${props => props.$rounded ? '50%' : '0'};
+  box-shadow: ${props => props.$shadow ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none'};
+  
+  &:hover {
+    img[data-hover="zoom"] {
+      transform: scale(1.05);
+    }
+  }
+`;
+
+const StyledImage = styled(Image)`
+  transition: transform 0.3s ease;
+`;
+
+// Компонент для отображения заглушки
+const Placeholder = styled.div<ImageWrapperProps>`
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 200%;
+  animation: shimmer 1.5s infinite;
+  border-radius: ${props => props.$rounded ? '50%' : '0'};
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+`;
+
+interface OptimizedImageProps {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
   rounded?: boolean;
   shadow?: boolean;
   fadeIn?: boolean;
-  hover?: 'zoom' | 'lift' | 'none';
+  hover?: 'zoom' | 'none';
+  style?: React.CSSProperties;
+  priority?: boolean;
 }
-
-const ImageWrapper = styled(motion.div)<{
-  $aspectRatio?: number;
-  $rounded: boolean;
-  $shadow: boolean;
-}>`
-  position: relative;
-  width: 100%;
-  height: ${props => props.$aspectRatio ? 'auto' : '100%'};
-  padding-top: ${props => props.$aspectRatio ? `${100 / props.$aspectRatio}%` : '0'};
-  overflow: hidden;
-  border-radius: ${props => props.$rounded ? '8px' : '0'};
-  box-shadow: ${props => props.$shadow ? '0 4px 12px rgba(0, 0, 0, 0.08)' : 'none'};
-`;
-
-const StyledImage = styled(Image)<{ $isLoaded: boolean }>`
-  opacity: ${props => props.$isLoaded ? 1 : 0};
-  transition: opacity 0.3s ease, transform 0.3s ease;
-`;
 
 const OptimizedImage: React.FC<OptimizedImageProps> = ({
   src,
   alt,
   width,
   height,
-  aspectRatio,
   rounded = false,
   shadow = false,
   fadeIn = true,
   hover = 'none',
-  ...props
+  style = {},
+  priority = false,
 }) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  
-  // Варианты эффектов при наведении
-  const hoverEffects = {
-    zoom: { scale: 1.05 },
-    lift: { y: -10 },
-    none: {}
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [hasError, setHasError] = React.useState(false);
+
+  // Генерируем заглушку для отсутствующего изображения
+  const generatePlaceholderSrc = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = '#e0e0e0';
+      ctx.font = '16px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(alt || 'Image', width / 2, height / 2);
+    }
+    return canvas.toDataURL();
   };
-  
-  useEffect(() => {
-    // Сбрасываем состояние загрузки при изменении src
-    setIsLoaded(false);
-  }, [src]);
-  
-  const handleLoadingComplete = () => {
-    setIsLoaded(true);
+
+  const handleError = () => {
+    setHasError(true);
+    setIsLoading(false);
   };
-  
+
+  const handleLoad = () => {
+    setIsLoading(false);
+  };
+
   return (
-    <ImageWrapper 
-      $aspectRatio={aspectRatio}
+    <ImageWrapper
       $rounded={rounded}
       $shadow={shadow}
-      whileHover={hoverEffects[hover]}
+      initial={fadeIn ? { opacity: 0 } : undefined}
+      animate={fadeIn ? { opacity: 1 } : undefined}
       transition={{ duration: 0.3 }}
+      style={style}
     >
-      <StyledImage
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        $isLoaded={!fadeIn || isLoaded}
-        onLoadingComplete={handleLoadingComplete}
-        style={{
-          objectFit: 'cover',
-          position: aspectRatio ? 'absolute' : 'relative',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: aspectRatio ? '100%' : 'auto'
-        }}
-        {...props}
-      />
+      {hasError ? (
+        <Placeholder $rounded={rounded} />
+      ) : (
+        <StyledImage
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          onError={handleError}
+          onLoad={handleLoad}
+          data-hover={hover}
+          priority={priority}
+          style={{
+            opacity: isLoading ? 0 : 1,
+            transition: 'opacity 0.3s ease',
+          }}
+        />
+      )}
+      {isLoading && !hasError && <Placeholder $rounded={rounded} />}
     </ImageWrapper>
   );
 };

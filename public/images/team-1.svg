@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="400" fill="#f0f0f0"/>
+  <circle cx="200" cy="180" r="60" fill="#d0d0d0"/>
+  <text x="200" y="200" font-family="Arial" font-size="48" fill="#808080" text-anchor="middle">АП</text>
+  <text x="200" y="280" font-family="Arial" font-size="24" fill="#404040" text-anchor="middle">Александр Петров</text>
+  <text x="200" y="310" font-family="Arial" font-size="18" fill="#606060" text-anchor="middle">Генеральный директор</text>
+</svg> 

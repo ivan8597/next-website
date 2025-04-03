@@ -62,19 +62,19 @@ const AboutPage = () => {
       id: 1,
       name: t('about.team.members.0.name'),
       position: t('about.team.members.0.position'),
-      image: '/images/team-1.jpg'
+      image: '/images/team-1.svg'
     },
     {
       id: 2,
       name: t('about.team.members.1.name'),
       position: t('about.team.members.1.position'),
-      image: '/images/team-2.jpg'
+      image: '/images/team-2.svg'
     },
     {
       id: 3,
       name: t('about.team.members.2.name'),
       position: t('about.team.members.2.position'),
-      image: '/images/team-3.jpg'
+      image: '/images/team-3.svg'
     }
   ];
   
