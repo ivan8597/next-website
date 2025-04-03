@@ -1,0 +1,139 @@
+{
+  "site": {
+    "name": "Our Company",
+    "description": "We create innovative solutions"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "contact": "Contact"
+  },
+  "header": {
+    "menu": "Menu"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're here to help",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message",
+    "submit": "Send Message",
+    "success": "Thank you! Your message has been sent.",
+    "error": "Failed to send message",
+    "placeholders": {
+      "name": "Your name",
+      "email": "Your email",
+      "message": "Your message"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Innovative Solutions for Your Business",
+      "description": "We help companies grow and reach new heights through modern technologies and individual approach to each client"
+    },
+    "features": {
+      "title": "Our Advantages",
+      "cards": [
+        {
+          "title": "Professionalism",
+          "description": "Team of experienced specialists with years of experience"
+        },
+        {
+          "title": "Innovation",
+          "description": "Using cutting-edge technologies and methodologies"
+        },
+        {
+          "title": "Quality",
+          "description": "Guaranteed high quality of all services provided"
+        },
+        {
+          "title": "Support",
+          "description": "24/7 technical support and consultations"
+        },
+        {
+          "title": "Flexibility",
+          "description": "Individual approach and adaptation to client needs"
+        },
+        {
+          "title": "Results",
+          "description": "Focus on achieving specific business goals"
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready to start collaboration?"
+    }
+  },
+  "about": {
+    "title": "About Us",
+    "description": "We are a team of professionals dedicated to creating innovative solutions",
+    "mission": {
+      "title": "Our Mission",
+      "description": "Our mission is to help businesses grow and succeed through advanced technological solutions. We strive to be a reliable partner for our clients, providing them with tools and services that allow them to focus on their core business objectives."
+    },
+    "history": {
+      "title": "Company History",
+      "description": "Our company was founded in 2010 by a group of like-minded individuals united by a common goal - to create quality and innovative products. Over the years, we have grown from a small team into a large organization that has implemented dozens of successful projects for clients around the world."
+    },
+    "team": {
+      "title": "Our Team",
+      "description": "At the heart of our success is the professionalism of our employees. We are proud to have assembled a team of highly qualified specialists, each of whom is an expert in their field.",
+      "members": [
+        {
+          "name": "Alexander Peterson",
+          "position": "CEO"
+        },
+        {
+          "name": "Elena Smith",
+          "position": "CTO"
+        },
+        {
+          "name": "Dmitry Johnson",
+          "position": "Lead Developer"
+        }
+      ]
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "description": "We provide a wide range of information technology services that will help your business reach a new level.",
+    "learnMore": "Learn More",
+    "items": {
+      "webDevelopment": {
+        "title": "Web Development",
+        "description": "Creating modern and efficient websites, online stores, and web applications using advanced technologies and best development practices."
+      },
+      "mobileDevelopment": {
+        "title": "Mobile Development",
+        "description": "Development of native and cross-platform mobile applications for iOS and Android, ensuring maximum performance and usability."
+      },
+      "seo": {
+        "title": "SEO Optimization",
+        "description": "Comprehensive website promotion in search engines, including technical audit, content optimization, and conversion rate improvement."
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "Analysis of data and business processes, creation of informative dashboards and reports for making informed decisions based on real data."
+      },
+      "maintenance": {
+        "title": "Technical Support",
+        "description": "Continuous support and maintenance of IT infrastructure, prompt resolution of emerging issues, and regular system updates."
+      },
+      "security": {
+        "title": "Information Security",
+        "description": "Audit and security of information systems, data protection, and prevention of unauthorized access."
+      }
+    },
+    "cta": {
+      "title": "Need a consultation on your project?",
+      "description": "Contact us and we will help you choose the optimal solution for your business tasks.",
+      "button": "Contact Us"
+    }
+  }
+} 

@@ -2,7 +2,12 @@ import { Button, Typography } from '@mui/material';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
 import YouTubeLite from '../components/YouTubeLite';
-import Head from 'next/head';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import type { GetStaticProps } from 'next';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, heroAnimation, sequentialFadeIn, scaleOnHover } from '../utils/animations';
+import SEO from '../components/SEO';
 
 const CustomContainer = styled.div`
   max-width: 1440px;
@@ -24,7 +29,7 @@ const HeroSection = styled.section`
   }
 `;
 
-const ContentSection = styled.div`
+const ContentSection = styled(motion.div)`
   width: 500px;
   margin-right: 120px;
 
@@ -49,7 +54,7 @@ const ContentSection = styled.div`
   }
 `;
 
-const VideoWrapper = styled.div`
+const VideoWrapper = styled(motion.div)`
   border-radius: 8px;
   overflow: hidden;
   width: 500px;
@@ -91,7 +96,7 @@ const LastSection = styled.section`
   justify-content: center;
 `;
 
-const CardsGrid = styled.div`
+const CardsGrid = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
@@ -102,7 +107,7 @@ const CardsGrid = styled.div`
   }
 `;
 
-const Card = styled.div`
+const Card = styled(motion.div)`
   text-align: left;
   
   h3 {
@@ -119,7 +124,7 @@ const Card = styled.div`
   }
 `;
 
-const LastSectionContent = styled.div`
+const LastSectionContent = styled(motion.div)`
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -134,24 +139,69 @@ const LastSectionContent = styled.div`
   }
 `;
 
+const AnimatedButton = styled(motion.div)`
+  display: inline-block;
+`;
+
 const MainPage = () => {
+  const { t } = useTranslation('common');
+  
+  // Структурированные данные для главной страницы (Schema.org)
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": t('site.name'),
+    "url": process.env.NEXT_PUBLIC_SITE_URL,
+    "logo": `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`,
+    "description": t('site.description'),
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Москва",
+      "addressCountry": "RU"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+7-123-456-7890",
+      "contactType": "customer service"
+    },
+    "sameAs": [
+      "https://www.facebook.com/yourcompany",
+      "https://twitter.com/yourcompany",
+      "https://www.linkedin.com/company/yourcompany"
+    ]
+  };
+  
   return (
     <Layout>
-      <Head>
-        <title>Some Company</title>
-        <meta name="description" content="Welcome" />
-      </Head>
+      <SEO 
+        title={t('site.name')}
+        description={t('site.description')}
+        structuredData={structuredData}
+      />
+      
       <CustomContainer>
         <HeroSection>
-          <ContentSection>
-            <Typography variant="h1">
-              Most important title on the page
-            </Typography>
-            <Typography paragraph>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mattis, leo et condimentum ultricies, sem urna convallis metus, vel suscipit nibh lacus tincidunt ante
-            </Typography>
+          <ContentSection
+            initial="hidden"
+            animate="visible"
+            variants={heroAnimation}
+          >
+            <motion.div variants={sequentialFadeIn(0.2)}>
+              <Typography variant="h1">
+                {t('home.hero.title')}
+              </Typography>
+            </motion.div>
+            <motion.div variants={sequentialFadeIn(0.4)}>
+              <Typography paragraph>
+                {t('home.hero.description')}
+              </Typography>
+            </motion.div>
           </ContentSection>
-          <VideoWrapper>
+          <VideoWrapper
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
             <YouTubeLite videoId="dQw4w9WgXcQ" />
           </VideoWrapper>
         </HeroSection>
@@ -159,55 +209,44 @@ const MainPage = () => {
 
       <CardsSection>
         <CustomContainer>
-          <Typography variant="h2">
-            Also very important title
-          </Typography>
-          <CardsGrid>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <Typography variant="h2">
+              {t('home.features.title')}
+            </Typography>
+          </motion.div>
+          
+          <CardsGrid
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
             {[...Array(6)].map((_, index) => (
-              <Card key={index}>
-                <h3>Title</h3>
+              <Card 
+                key={index}
+                variants={fadeInUp}
+                whileHover={{ y: -10, transition: { duration: 0.2 } }}
+              >
+                <h3>{t(`home.features.cards.${index}.title`)}</h3>
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mattis, leo et condimentum
+                  {t(`home.features.cards.${index}.description`)}
                 </p>
               </Card>
             ))}
           </CardsGrid>
-          <Button 
-            variant="contained" 
-            href="/contact"
-            sx={{
-              borderRadius: '8px',
-              padding: '8px 40px',
-              height: '36px',
-              minWidth: '160px',
-              textTransform: 'none',
-              fontSize: '16px',
-              background: '#1A202C',
-              '&:hover': {
-                background: '#2D3748'
-              }
-            }}
+          
+          <AnimatedButton
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6, duration: 0.4 }}
+            {...scaleOnHover}
           >
-            Contact us
-          </Button>
-        </CustomContainer>
-      </CardsSection>
-
-      <LastSection>
-        <CustomContainer>
-          <LastSectionContent>
-            <Typography 
-              variant="h2" 
-              sx={{ 
-                fontSize: '48px',
-                lineHeight: 1.2,
-                fontWeight: 700,
-                marginBottom: '1.5rem',
-                letterSpacing: '-0.02em'
-              }}
-            >
-              Less important title
-            </Typography>
             <Button 
               variant="contained" 
               href="/contact"
@@ -224,13 +263,36 @@ const MainPage = () => {
                 }
               }}
             >
-              Contact us
+              {t('nav.contact')}
             </Button>
+          </AnimatedButton>
+        </CustomContainer>
+      </CardsSection>
+
+      <LastSection>
+        <CustomContainer>
+          <LastSectionContent
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            <Typography variant="h2">
+              {t('home.cta.title')}
+            </Typography>
           </LastSectionContent>
         </CustomContainer>
       </LastSection>
     </Layout>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
+    },
+  };
 };
 
 export default MainPage;

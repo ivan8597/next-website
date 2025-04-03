@@ -1,0 +1,11 @@
+CREATE DATABASE next_website;
+
+\c next_website;
+
+CREATE TABLE form_submissions (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+); 

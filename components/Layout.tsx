@@ -1,7 +1,9 @@
+import React from 'react';
 import { ReactNode } from 'react';
 import styled from 'styled-components';
 import Header from './Header';
 import Footer from './Footer';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -21,6 +23,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <LayoutWrapper>
       <Header />
+      <LanguageSwitcher />
       <Main>{children}</Main>
       <Footer />
     </LayoutWrapper>

@@ -1,17 +1,23 @@
 import { useState } from 'react';
-import { Button, Container, TextField, Typography, Box, CircularProgress } from '@mui/material';
+import { Button, Container, TextField, Typography, Box, CircularProgress, Alert } from '@mui/material';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
 import Head from 'next/head';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import type { GetStaticProps } from 'next';
+import { motion } from 'framer-motion';
+import { fadeInUp, fadeIn } from '../utils/animations';
+import { useLazyApiData } from '../hooks/useApi';
+import { api } from '../utils/api';
 
 const ContactSection = styled.section`
   padding: 4rem 0;
-
   display: flex;
   justify-content: center;
 `;
 
-const ContactContent = styled.div`
+const ContactContent = styled(motion.div)`
   width: 100%;
   text-align: left;
   padding: 2rem;
@@ -26,7 +32,7 @@ const ContactContent = styled.div`
   }
 `;
 
-const FormContainer = styled.div`
+const FormContainer = styled(motion.div)`
   padding: 2rem;
   width: 100%;
   max-width: 450px;
@@ -34,6 +40,7 @@ const FormContainer = styled.div`
   background: white;
   border: 1px solid #E2E8F0;
   border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 `;
 
 const Form = styled.form`
@@ -42,7 +49,7 @@ const Form = styled.form`
   gap: 1.5rem;
 `;
 
-const ResponseMessage = styled.p`
+const ResponseMessage = styled(motion.p)`
   width: 100%;
   text-align: center;
   font-size: 72px;
@@ -53,40 +60,31 @@ const ResponseMessage = styled.p`
 `;
 
 const ContactPage = () => {
+  const { t } = useTranslation('common');
   const [response, setResponse] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: '',
   });
 
+  // Используем хук useLazyApiData для отправки формы
+  const { fetch: submitForm, isLoading, isError, error } = useLazyApiData(
+    '/api/form/submit', 
+    {
+      onSuccess: () => {
+        setResponse(t('contact.success'));
+      }
+    }
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
+    
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Something went wrong');
-      }
-
-      setResponse('Message generated on the server');
+      await submitForm(formData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message');
-    } finally {
-      setLoading(false);
+      console.error("Error submitting form:", err);
     }
   };
 
@@ -94,13 +92,23 @@ const ContactPage = () => {
     return (
       <Layout>
         <Head>
-          <title>Contact Us | Some Company</title>
-          <meta name="description" content="Contact us through our form" />
+          <title>{t('contact.title')} | {t('site.name')}</title>
+          <meta name="description" content={t('contact.subtitle')} />
         </Head>
         <ContactSection>
           <Container maxWidth="md">
-            <ContactContent>
-              <ResponseMessage>{response}</ResponseMessage>
+            <ContactContent
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <ResponseMessage
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+              >
+                {response}
+              </ResponseMessage>
             </ContactContent>
           </Container>
         </ContactSection>
@@ -111,26 +119,43 @@ const ContactPage = () => {
   return (
     <Layout>
       <Head>
-        <title>Contact Us | Some Company</title>
-        <meta name="description" content="Contact us through our form" />
+        <title>{t('contact.title')} | {t('site.name')}</title>
+        <meta name="description" content={t('contact.subtitle')} />
       </Head>
       <ContactSection>
         <Container maxWidth="md">
-          <ContactContent>
-            <Typography 
-              variant="h1" 
-              sx={{ 
-                fontSize: '72px',
-                lineHeight: 1.2,
-                fontWeight: 700,
-                textAlign: 'center',
-                marginBottom: '3rem'
-              }}
+          <ContactContent
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+          >
+            <motion.div variants={fadeInUp}>
+              <Typography 
+                variant="h1" 
+                sx={{ 
+                  fontSize: { xs: '48px', md: '72px' },
+                  lineHeight: 1.2,
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  marginBottom: '3rem'
+                }}
+              >
+                {t('contact.title')}
+              </Typography>
+            </motion.div>
+            
+            <FormContainer
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
             >
-              Only CTA on the page
-            </Typography>
-            <FormContainer>
               <Form onSubmit={handleSubmit}>
+                {isError && (
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    {error?.message || t('contact.error')}
+                  </Alert>
+                )}
+                
                 <Box sx={{ mb: 1.5 }}>
                   <Typography 
                     sx={{ 
@@ -140,7 +165,7 @@ const ContactPage = () => {
                       color: '#1A202C'
                     }}
                   >
-                    Name
+                    {t('contact.name')}
                   </Typography>
                   <TextField
                     id="name"
@@ -150,7 +175,7 @@ const ContactPage = () => {
                     hiddenLabel
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Value"
+                    placeholder={t('contact.placeholders.name')}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: '9px',
@@ -184,7 +209,7 @@ const ContactPage = () => {
                       color: '#1A202C'
                     }}
                   >
-                    Email
+                    {t('contact.email')}
                   </Typography>
                   <TextField
                     id="email"
@@ -195,7 +220,7 @@ const ContactPage = () => {
                     hiddenLabel
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="Value"
+                    placeholder={t('contact.placeholders.email')}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: '9px',
@@ -220,7 +245,7 @@ const ContactPage = () => {
                     }}
                   />
                 </Box>
-                <Box sx={{ mb: 1.5 }}>
+                <Box sx={{ mb: 2 }}>
                   <Typography 
                     sx={{ 
                       marginBottom: '0.5rem',
@@ -229,19 +254,19 @@ const ContactPage = () => {
                       color: '#1A202C'
                     }}
                   >
-                    Message
+                    {t('contact.message')}
                   </Typography>
                   <TextField
                     id="message"
                     variant="outlined"
                     fullWidth
                     required
-                    hiddenLabel
                     multiline
-                    minRows={4}
+                    rows={4}
+                    hiddenLabel
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Value"
+                    placeholder={t('contact.placeholders.message')}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: '9px',
@@ -266,38 +291,27 @@ const ContactPage = () => {
                     }}
                   />
                 </Box>
-                <Button
+                <Button 
+                  variant="contained" 
+                  fullWidth 
                   type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={loading}
+                  disabled={isLoading}
                   sx={{
-                    height: '36px',
-                    background: '#1A202C',
-                    color: 'white',
                     borderRadius: '9px',
-                    padding: '8px',
-                    fontSize: '16px',
-                    fontWeight: 500,
+                    padding: '0.75rem',
                     textTransform: 'none',
+                    background: '#1A202C',
                     '&:hover': {
-                      background: '#2D3748',
-                    },
+                      background: '#2D3748'
+                    }
                   }}
                 >
-                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Submit'}
+                  {isLoading ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    t('contact.submit')
+                  )}
                 </Button>
-                {error && (
-                  <Typography 
-                    color="error" 
-                    sx={{ 
-                      textAlign: 'center',
-                      marginTop: '1rem'
-                    }}
-                  >
-                    {error}
-                  </Typography>
-                )}
               </Form>
             </FormContainer>
           </ContactContent>
@@ -305,6 +319,14 @@ const ContactPage = () => {
       </ContactSection>
     </Layout>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
+    },
+  };
 };
 
 export default ContactPage;
